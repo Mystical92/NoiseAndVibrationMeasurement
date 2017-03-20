@@ -7,9 +7,16 @@
 
 #include <avr/io.h>
 
+#include "src/mylibraries/usart/usart.h"
+#include "src/mylibraries/peripherals/peripherals.h"
+
+
 
 int main(void)
 {
+	enableOscillator_32mhz();
+	USART_configurate();
+
     while (1) 
     {
     }
