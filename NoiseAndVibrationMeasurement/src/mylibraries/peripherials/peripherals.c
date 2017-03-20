@@ -8,18 +8,18 @@
  #include <avr/io.h>
  #include "../usart/usart.h"
  #include "peripherals.h"
- #include "LUFA/Drivers/Peripheral/TWI.h"
+// #include "LUFA/Drivers/Peripheral/TWI.h"
 
 void setRGB_pins(ConfigurationRGB config, uint8_t red, uint8_t green, uint8_t blue );
 
-
+/*
 void TWI_configurate(void)
 {
 	PORTE.PIN0CTRL = PORT_OPC_WIREDANDPULL_gc;
 	PORTE.PIN1CTRL = PORT_OPC_WIREDANDPULL_gc;
 	TWI_Init(&TWIE, TWI_BAUD_FROM_FREQ(400000));
 }
-
+*/
 void configurateInterrupts(void)
 {
 	PMIC.CTRL = PMIC_HILVLEN_bm | PMIC_LOLVLEN_bm;
@@ -33,7 +33,7 @@ void configurateInterrupts(void)
 	  CPU_CCP      =    CCP_IOREG_gc;         // odblokowanie zmiany Ÿród³a sygna³u
 	  CLK.CTRL     =    CLK_SCLKSEL_RC32M_gc; // zmiana Ÿród³a sygna³u na RC 32MHz
   }
-
+/*
  void USART_configurate()
  {
 	 PORTF_OUTSET=PIN3_bm;
@@ -54,7 +54,7 @@ void configurateInterrupts(void)
 	 PORTE.INT0MASK = PIN2_bm;
 	 PORTE.INTCTRL = PORT_INT0LVL_HI_gc;
  }
-
+ */
  void rgbLed_loadConfig(ConfigurationRGB config)
  {
 	config.rgbPort->DIRSET = config.pinRed | config.pinGreen | config.pinBlue;
