@@ -33,20 +33,23 @@ void configurateInterrupts(void)
 	  CPU_CCP      =    CCP_IOREG_gc;         // odblokowanie zmiany Ÿród³a sygna³u
 	  CLK.CTRL     =    CLK_SCLKSEL_RC32M_gc; // zmiana Ÿród³a sygna³u na RC 32MHz
   }
-/*
+
  void USART_configurate()
  {
-	 PORTF_OUTSET=PIN3_bm;
-	 PORTF_DIRSET=PIN3_bm;
-	 // wlacz odbiornik oraz nadajnik USART
-	 USARTF0.CTRLB=USART_RXEN_bm | USART_TXEN_bm;
-	 // ramka 8 bitów, bez parzystoœci, 1 bit stopu
-	 USARTF0.CTRLC=USART_CHSIZE_8BIT_gc;
-	 usart_set_baudrate(&USARTF0, 115200, F_CPU);
-	 // odblokuj przerwania odbiornika
-	 USARTF0.CTRLA=USART_RXCINTLVL_HI_gc;
- }
+	 PORTC_OUTSET = PIN3_bm;
+	 PORTC_DIRSET = PIN3_bm;
 
+	 PORTC_OUTCLR = PIN2_bm;
+	 PORTC_DIRCLR = PIN2_bm;
+	 // wlacz odbiornik oraz nadajnik USART
+	 USARTC0.CTRLB = USART_RXEN_bm | USART_TXEN_bm;
+	 // ramka 8 bitów, bez parzystoœci, 1 bit stopu
+	 USARTC0.CTRLC = USART_CHSIZE_8BIT_gc;
+	 usart_set_baudrate(&USARTC0, 115200, F_CPU);
+	 // odblokuj przerwania odbiornika
+	 USARTC0.CTRLA = USART_RXCINTLVL_HI_gc;
+ }
+/*
  void MMA8451_DataReady_InteruptConfig()
  {
 	 PORTE.DIRCLR = PIN2_bm;
