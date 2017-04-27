@@ -6,7 +6,7 @@
  */ 
 
 #include "mma854x.h"
-#include "LUFA/Drivers/Peripheral/TWI.h"
+#include "../../LUFA/TWI_XMEGA.h"
 
 #define DATA_STATUS		0x00
 #define OUT_X_MSB		0x01
