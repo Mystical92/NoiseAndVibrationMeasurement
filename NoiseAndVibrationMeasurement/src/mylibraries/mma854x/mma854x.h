@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#define  TWI_PORT TWIE
+#define  TWI_PORT TWIC
 #define  TWI_SLAVE_ADDRES 0x38
 
 typedef struct {
