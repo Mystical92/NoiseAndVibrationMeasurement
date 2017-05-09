@@ -49,15 +49,15 @@ void configurateInterrupts(void)
 	 // odblokuj przerwania odbiornika
 	 USARTC0.CTRLA = USART_RXCINTLVL_HI_gc;
  }
-/*
+
  void MMA8451_DataReady_InteruptConfig()
  {
-	 PORTE.DIRCLR = PIN2_bm;
-	 PORTE.PIN2CTRL = PORT_ISC_FALLING_gc | PORT_OPC_PULLUP_gc;
-	 PORTE.INT0MASK = PIN2_bm;
-	 PORTE.INTCTRL = PORT_INT0LVL_HI_gc;
+	 PORTD.DIRCLR = PIN2_bm;
+	 PORTD.PIN2CTRL = PORT_ISC_FALLING_gc | PORT_OPC_PULLUP_gc;
+	 PORTD.INTMASK = PIN2_bm; // int source
+	 PORTD.INTCTRL = PORT_INTLVL_HI_gc; // priorytet przerwania
  }
- */
+
  void rgbLed_loadConfig(ConfigurationRGB config)
  {
 	config.rgbPort->DIRSET = config.pinRed | config.pinGreen | config.pinBlue;
