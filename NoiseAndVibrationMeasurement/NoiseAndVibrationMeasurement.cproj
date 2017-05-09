@@ -20,10 +20,10 @@
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
     <ProgFlashFromRam>true</ProgFlashFromRam>
-    <RamSnippetAddress />
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
     <UncachedRange />
     <preserveEEPROM>true</preserveEEPROM>
-    <OverrideVtorValue />
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
     <BootSegment>2</BootSegment>
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfFrameworkConfig>
@@ -38,6 +38,34 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
+    <avrtoolserialnumber />
+    <avrdeviceexpectedsignature>0x1E954C</avrdeviceexpectedsignature>
+    <custom>
+      <ToolOptions>
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType>custom</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>Custom Programming Tool</ToolName>
+    </custom>
+    <avrtoolinterface />
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions xmlns="">
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber xmlns="">
+      </ToolNumber>
+      <ToolName xmlns="">Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -128,6 +156,12 @@
     <Compile Include="src\LUFA\TWI_XMEGA.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\mylibraries\mma854x\mma854x.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mylibraries\mma854x\mma854x.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\mylibraries\peripherals\peripherals.c">
       <SubType>compile</SubType>
     </Compile>
@@ -145,6 +179,7 @@
     <Folder Include="src" />
     <Folder Include="src\LUFA\" />
     <Folder Include="src\mylibraries" />
+    <Folder Include="src\mylibraries\mma854x\" />
     <Folder Include="src\mylibraries\usart" />
     <Folder Include="src\mylibraries\peripherals" />
   </ItemGroup>
