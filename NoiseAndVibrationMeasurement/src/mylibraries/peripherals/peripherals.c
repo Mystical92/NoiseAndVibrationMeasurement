@@ -5,21 +5,21 @@
  *  Author: kamil
  */ 
 
- #include <avr/io.h>
- #include "../usart/usart.h"
- #include "peripherals.h"
-// #include "LUFA/Drivers/Peripheral/TWI.h"
+#include <avr/io.h>
+#include "../usart/usart.h"
+#include "peripherals.h"
+#include "../../LUFA/TWI_XMEGA.h"
 
 void setRGB_pins(ConfigurationRGB config, uint8_t red, uint8_t green, uint8_t blue );
 
-/*
+
 void TWI_configurate(void)
 {
-	PORTE.PIN0CTRL = PORT_OPC_WIREDANDPULL_gc;
-	PORTE.PIN1CTRL = PORT_OPC_WIREDANDPULL_gc;
-	TWI_Init(&TWIE, TWI_BAUD_FROM_FREQ(400000));
+	PORTC.PIN0CTRL = PORT_OPC_WIREDANDPULL_gc;
+	PORTC.PIN1CTRL = PORT_OPC_WIREDANDPULL_gc;
+	TWI_Init(&TWIC, TWI_BAUD_FROM_FREQ(400000));
 }
-*/
+
 void configurateInterrupts(void)
 {
 	PMIC.CTRL = PMIC_HILVLEN_bm | PMIC_LOLVLEN_bm;
