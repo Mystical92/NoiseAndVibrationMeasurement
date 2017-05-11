@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #define  TWI_PORT TWIC
-#define  TWI_SLAVE_ADDRES 0x38
+#define  TWI_SLAVE_ADDRES 0x3A // adress 0x1D -> 11101<<1 = 111010 (0x3A)
 
 typedef struct {
 	int16_t x;	
