@@ -30,6 +30,7 @@ void configurateInterrupts(void);
 void enableOscillator_32mhz(void);
 void USART_configurate(void);
 void MMA8451_DataReady_InteruptConfig(void);
+bool configurateMMA845x(void);
 void TWI_configurate(void);
 
 

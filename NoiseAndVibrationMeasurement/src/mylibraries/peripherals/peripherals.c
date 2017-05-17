@@ -6,9 +6,11 @@
  */ 
 
 #include <avr/io.h>
+#include <stdbool.h>
 #include "../usart/usart.h"
 #include "peripherals.h"
 #include "../../LUFA/TWI_XMEGA.h"
+#include "../mma854x/mma854x.h"
 
 void setRGB_pins(ConfigurationRGB config, uint8_t red, uint8_t green, uint8_t blue );
 
@@ -56,6 +58,27 @@ void configurateInterrupts(void)
 	 PORTD.PIN2CTRL = PORT_ISC_FALLING_gc | PORT_OPC_PULLUP_gc;
 	 PORTD.INTMASK = PIN2_bm; // int source
 	 PORTD.INTCTRL = PORT_INTLVL_HI_gc; // priorytet przerwania
+ }
+ 
+ bool configurateMMA845x(void)
+ {
+	 TWI_configurate();
+	 
+	 bool isErrorOccurred[4];
+	 
+	 if (MMA845x_EnableHighPassFilterData() > 0)
+		isErrorOccurred[0] = true;
+	 
+	 if (MMA845x_InterruptConfig() > 0)
+		isErrorOccurred[1] = true;
+
+	 if(MMA845x_SetDataRate(0) > 0)
+		isErrorOccurred[2] = true;
+
+	 if(MMA845x_ActiveMode() > 0)
+		isErrorOccurred[3] = true;
+
+	 return (isErrorOccurred[0] && isErrorOccurred[1] && isErrorOccurred[2] && isErrorOccurred[3]);
  }
 
  void rgbLed_loadConfig(ConfigurationRGB config)
