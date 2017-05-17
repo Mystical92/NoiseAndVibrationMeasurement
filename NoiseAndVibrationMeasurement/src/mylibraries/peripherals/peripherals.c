@@ -64,7 +64,7 @@ void configurateInterrupts(void)
  {
 	 TWI_configurate();
 	 
-	 bool isErrorOccurred[4];
+	 bool isErrorOccurred[4] = {false,false,false,false};
 	 
 	 if (MMA845x_EnableHighPassFilterData() > 0)
 		isErrorOccurred[0] = true;
