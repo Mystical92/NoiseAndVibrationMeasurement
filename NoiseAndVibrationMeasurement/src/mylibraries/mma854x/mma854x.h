@@ -44,7 +44,9 @@ void MMA845x_SetHighPassFilterFreq(void);
 
 uint8_t MMA845x_InterruptConfig(void);
 
-uint8_t MMA845x_ReadData(uint8_t[]);
+void MMA845x_InterruptStop(void);
+
+void MMA845x_ReadData(uint8_t[]);
 
 void MMA845x_readDataWithoutCheck(uint8_t[]);
 

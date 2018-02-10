@@ -55,7 +55,7 @@ void configurateInterrupts(void)
  void MMA8451_DataReady_InteruptConfig()
  {
 	 PORTD.DIRCLR = PIN2_bm;
-	 PORTD.PIN2CTRL = PORT_ISC_FALLING_gc | PORT_OPC_PULLUP_gc;
+	 PORTD.PIN2CTRL = PORT_ISC_FALLING_gc;
 	 PORTD.INTMASK = PIN2_bm; // int source
 	 PORTD.INTCTRL = PORT_INTLVL_HI_gc; // priorytet przerwania
  }
@@ -69,14 +69,14 @@ void configurateInterrupts(void)
 	 if (MMA845x_EnableHighPassFilterData() > 0)
 		isErrorOccurred[0] = true;
 	 
-	 if (MMA845x_InterruptConfig() > 0)
-		isErrorOccurred[1] = true;
+	 //if (MMA845x_InterruptConfig() > 0)
+	//	isErrorOccurred[1] = true;
 
 	 if(MMA845x_SetDataRate(0) > 0)
 		isErrorOccurred[2] = true;
 
-	 if(MMA845x_ActiveMode() > 0)
-		isErrorOccurred[3] = true;
+	 //if(MMA845x_ActiveMode() > 0)
+		//isErrorOccurred[3] = true;
 
 	 return (isErrorOccurred[0] && isErrorOccurred[1] && isErrorOccurred[2] && isErrorOccurred[3]);
  }

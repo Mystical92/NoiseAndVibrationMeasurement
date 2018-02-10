@@ -30,9 +30,9 @@
 #define FS_8G			0x02
 
 // Interrupt Mask
-#define PP_OD_MASK		0x01
+#define PP_OD_MASK		0x00
 #define INT_EN_DR_MASK	0x01
-#define INT_CFG_DR_MASK	0x01
+#define INT_CFG_DR_MASK	0x00
  
 uint8_t MMA845x_Standby(void)
 {
@@ -221,25 +221,29 @@ uint8_t MMA845x_InterruptConfig(void)
 	return isError;	
 }
 
-uint8_t MMA845x_ReadData(uint8_t readData[])
+void MMA845x_InterruptStop(void)
+{
+		uint8_t regAddress = CTRL_REG4;
+		uint8_t sendData = 0;
+		
+		TWI_WritePacket(&TWI_PORT, TWI_SLAVE_ADDRES, 10, &regAddress, sizeof(regAddress),
+		&sendData, sizeof(sendData));
+}
+
+void MMA845x_ReadData(uint8_t readData[])
 {
 	uint8_t regAddress = DATA_STATUS;
 	uint8_t dataStatusReg;
-	uint8_t isError = 0;
 
-	TWI_ReadPacket(&TWI_PORT, TWI_SLAVE_ADDRES, 10, &regAddress, sizeof(regAddress),
-	&dataStatusReg, sizeof(dataStatusReg));
-
-	if(dataStatusReg & ZYXDR_MASK)
+	do
 	{
-		regAddress = OUT_X_MSB;
 		TWI_ReadPacket(&TWI_PORT, TWI_SLAVE_ADDRES, 10, &regAddress, sizeof(regAddress),
-		readData, 6);
-	}
-	else
-		isError = 1;
-
-	return isError;
+		&dataStatusReg, sizeof(dataStatusReg));
+	}while(!(dataStatusReg & ZYXDR_MASK));
+	
+	regAddress = OUT_X_MSB;
+	TWI_ReadPacket(&TWI_PORT, TWI_SLAVE_ADDRES, 10, &regAddress, sizeof(regAddress),
+	readData, 6);
 }
 
 void MMA845x_readDataWithoutCheck(uint8_t readData[])
