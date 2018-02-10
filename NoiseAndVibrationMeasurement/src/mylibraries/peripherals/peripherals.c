@@ -5,21 +5,23 @@
  *  Author: kamil
  */ 
 
- #include <avr/io.h>
- #include "../usart/usart.h"
- #include "peripherals.h"
-// #include "LUFA/Drivers/Peripheral/TWI.h"
+#include <avr/io.h>
+#include <stdbool.h>
+#include "../usart/usart.h"
+#include "peripherals.h"
+#include "../../LUFA/TWI_XMEGA.h"
+#include "../mma854x/mma854x.h"
 
 void setRGB_pins(ConfigurationRGB config, uint8_t red, uint8_t green, uint8_t blue );
 
-/*
+
 void TWI_configurate(void)
 {
-	PORTE.PIN0CTRL = PORT_OPC_WIREDANDPULL_gc;
-	PORTE.PIN1CTRL = PORT_OPC_WIREDANDPULL_gc;
-	TWI_Init(&TWIE, TWI_BAUD_FROM_FREQ(400000));
+	PORTC.PIN0CTRL = PORT_OPC_WIREDANDPULL_gc;
+	PORTC.PIN1CTRL = PORT_OPC_WIREDANDPULL_gc;
+	TWI_Init(&TWIC, TWI_BAUD_FROM_FREQ(400000));
 }
-*/
+
 void configurateInterrupts(void)
 {
 	PMIC.CTRL = PMIC_HILVLEN_bm | PMIC_LOLVLEN_bm;
@@ -49,15 +51,36 @@ void configurateInterrupts(void)
 	 // odblokuj przerwania odbiornika
 	 USARTC0.CTRLA = USART_RXCINTLVL_HI_gc;
  }
-/*
+
  void MMA8451_DataReady_InteruptConfig()
  {
-	 PORTE.DIRCLR = PIN2_bm;
-	 PORTE.PIN2CTRL = PORT_ISC_FALLING_gc | PORT_OPC_PULLUP_gc;
-	 PORTE.INT0MASK = PIN2_bm;
-	 PORTE.INTCTRL = PORT_INT0LVL_HI_gc;
+	 PORTD.DIRCLR = PIN2_bm;
+	 PORTD.PIN2CTRL = PORT_ISC_FALLING_gc;
+	 PORTD.INTMASK = PIN2_bm; // int source
+	 PORTD.INTCTRL = PORT_INTLVL_HI_gc; // priorytet przerwania
  }
- */
+ 
+ bool configurateMMA845x(void)
+ {
+	 TWI_configurate();
+	 
+	 bool isErrorOccurred[4] = {false,false,false,false};
+	 
+	 if (MMA845x_EnableHighPassFilterData() > 0)
+		isErrorOccurred[0] = true;
+	 
+	 //if (MMA845x_InterruptConfig() > 0)
+	//	isErrorOccurred[1] = true;
+
+	 if(MMA845x_SetDataRate(0) > 0)
+		isErrorOccurred[2] = true;
+
+	 //if(MMA845x_ActiveMode() > 0)
+		//isErrorOccurred[3] = true;
+
+	 return (isErrorOccurred[0] && isErrorOccurred[1] && isErrorOccurred[2] && isErrorOccurred[3]);
+ }
+
  void rgbLed_loadConfig(ConfigurationRGB config)
  {
 	config.rgbPort->DIRSET = config.pinRed | config.pinGreen | config.pinBlue;

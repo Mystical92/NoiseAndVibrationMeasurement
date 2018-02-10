@@ -115,8 +115,9 @@
 #ifndef __TWI_XMEGA_H__
 #define __TWI_XMEGA_H__
 
-
+		#include <avr/io.h>
 		#include <stdio.h>
+		#include <stdbool.h>
 
 	/* Public Interface - May be used in end-application: */
 		/* Macros: */
