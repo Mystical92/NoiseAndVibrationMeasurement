@@ -1,2 +1,11 @@
 *.vs
-Debug/
+
+*.o
+
+*.d
+
+*.mk
+
+NoiseAndVibrationMeasurement/Debug/
+
+NoiseAndVibrationMeasurement/Release/
