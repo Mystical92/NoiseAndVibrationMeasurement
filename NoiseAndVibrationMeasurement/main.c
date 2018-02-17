@@ -14,6 +14,7 @@
 #include "src/mylibraries/usart/usart.h"
 #include "src/mylibraries/peripherals/peripherals.h"
 #include "src/mylibraries/mma854x/mma854x.h"
+#include "src/mylibraries/adc/adc.h"
 #include "src/mylibraries/data_conversion/DataConversion.h"
 
 #define VIBRATION_SAMPLE_REQUIRED 1000
