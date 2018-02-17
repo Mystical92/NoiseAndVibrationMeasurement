@@ -36,7 +36,6 @@ void ADC_configurate()
 
 void adcCH_noiseMeasure_enable()
 {
-	adcCH_noiseMeasure_init(&ADCA.CH0, ADC_CH_MUXPOS_PIN0_gc, ADC_CH_MUXNEG_PIN1_gc);
 	adcTriggerTimer_init();
 }
 
@@ -47,47 +46,27 @@ void adcCH_batteryMeasure_enable()
 
 void adcTriggerTimer_init() 
 {
-	// zwyk³y tryb pracy timera
-	TCC0.CTRLB=TC_WGMODE_NORMAL_gc;
 	// domyœlnie zegar nie podlaczony
-	TCC0.CTRLA=TC_CLKSEL_OFF_gc;
+	TCC4.CTRLA&=~TC4_CLKSEL_gm;
 	
 	// Taktowanie = 32[MHz] : 8 = 4[MHz]
-	// Dla czêstotliwoœci próbkowania 8[kHz]
 	// 4 000 000[Hz] / PER + 1  => PER = 499
 	// PER = 9 dla 50kHz
-	TCC0.PER=499;
-	TCC0.CCA=0;
-	// routowane do kana³u zdarzeñ nr 0 	
-	EVSYS_CH0MUX=EVSYS_CHMUX_TCC0_CCA_gc;
+	TCC4.PER=499;
+	TCC4.CCA=0;
 }
 
 void adcTriggerTimer_enable() 
 {
-	TCC0.CCA=0;
-	TCC0.CTRLA=TC_CLKSEL_DIV8_gc; 
-	// 64 dla 500kHz
+	TCC4.CCA=0;
+    // Prescaler = 64 dla 500kHz
+	TCC4.CTRLA|=TC4_CLKSEL0_bm | TC4_CLKSEL2_bm; 
+
 }
 
 void adcTriggerTimer_disable() 
 {
-	TCC0.CTRLA=TC_CLKSEL_OFF_gc;
-}
-
-void adcCH_noiseMeasure_init(ADC_CH_t *adcch, register8_t muxpos, register8_t muxneg) 
-{
-	 adcch->CTRL = ADC_CH_INPUTMODE_DIFF_gc;
-	 // pin wejœcia dodatniego
-	 adcch->MUXCTRL = muxpos | muxneg;
-	 adcch->INTCTRL = ADC_CH_INTLVL_HI_gc | ADC_CH_INTMODE_COMPLETE_gc;
-}
-
-void adcCH_batteryMeasure_init(ADC_CH_t *adcch, register8_t muxpos)
-{
-	adcch->CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;
-	// pin wejœcia dodatniego
-	adcch->MUXCTRL = muxpos;
-	adcch->INTCTRL = 0;
+	TCC4.CTRLA&=~TC4_CLKSEL_gm;
 }
 
 uint16_t adc_GetOffset()
@@ -95,13 +74,12 @@ uint16_t adc_GetOffset()
 	uint32_t accum = 0;
 	uint16_t counter = 0;
 
-	adcCH_noiseMeasure_init(&ADCA.CH0, ADC_CH_MUXPOS_PIN1_gc, ADC_CH_MUXNEG_PIN1_gc);
 	do 
 	{
 		ADCA.CH0.CTRL |= ADC_CH_START_bm;
-		while(!(ADCA.CH0.INTFLAGS & ADC_CH_CHIF_bm));
+		while(!(ADCA.CH0.INTFLAGS & ADC_CH0IF_bm));
 		
-		ADCA.CH0.INTFLAGS = ADC_CH_CHIF_bm;
+		ADCA.CH0.INTFLAGS = ADC_CH0IF_bm;
 		accum += ADCA.CH0RES;
 		counter++;
 	} while (counter < 1024);
@@ -118,9 +96,9 @@ uint16_t adc_MeasureBatteryVoltage()
 	do
 	{
 		ADCA.CH0.CTRL |= ADC_CH_START_bm;
-		while(!(ADCA.CH0.INTFLAGS & ADC_CH_CHIF_bm));
+		while(!(ADCA.CH0.INTFLAGS & ADC_CH0IF_bm));
 		
-		ADCA.CH0.INTFLAGS = ADC_CH_CHIF_bm;
+		ADCA.CH0.INTFLAGS = ADC_CH0IF_bm;
 		accum += ADCA.CH0RES;
 		counter++;
 	} while (counter < 1024);
