@@ -18,6 +18,7 @@
 #include "src/mylibraries/data_conversion/DataConversion.h"
 
 #define VIBRATION_SAMPLE_REQUIRED 1000
+#define SOUND_LEVEL_SAMPLE_REQUIRED		1000
 
 typedef enum
 {
@@ -65,6 +66,9 @@ accelerationAxis_floatRepresentation trueRmsVibrationData;
 
 int main(void)
 {
+	uint16_t microphoneVoltageSampleCount = 0;
+	int16_t voltageSamples_binary[SOUND_LEVEL_SAMPLE_REQUIRED];
+	
 	enableOscillator_32mhz();
 	//configurateInterrupts();
 	USART_configurate();
