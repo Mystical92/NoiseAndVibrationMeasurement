@@ -42,11 +42,20 @@ typedef enum
 
 }EProcessState;
 
+typedef enum
+{
+	NONE,
+	BATTERY_VOLTAGE_MEASUREMETN,
+	MICROPHONE_VOLTAGE_MEASUREMENT,
+}EMeasurementType;
+
+
 void parseToCharArr(char* arr, uint16_t number);
 void sendString_with_float(	USART_t * const usart, float floatNumber, const char *txt_before, const char *txt_after );
 void convertAndCalculateVibrationData(uint8_t *MMA845x_recivedValues, accelerationAxis_floatRepresentation *tempData, uint16_t *vibrationSampleCount);
 
 volatile EProcessState global_procesState = VIBRATIONS_MEASURE_INIT;
+volatile EMeasurementType	global_actualMeasurement = NONE;
 volatile uint16_t errorCounter = 0;
 
 uint8_t MMA845x_recivedValues[6];
@@ -295,6 +304,21 @@ int main(void)
 ISR(PORTD_INT_vect)
 {
 
+}
+
+ISR(ADCA_CH0_vect)
+{
+	if (global_procesState != WAIT_FOR_ACTION)
+	{
+		global_procesState = ERROR;
+	}
+	else
+	{
+		if(global_actualMeasurement == MICROPHONE_VOLTAGE_MEASUREMENT)
+		global_procesState = NOISE_DATA_READY;
+		else
+		global_procesState = BATTERY_VOLTAGE_MEASURE;
+	}
 }
 
 void parseToCharArr(char* arr, uint16_t number)
