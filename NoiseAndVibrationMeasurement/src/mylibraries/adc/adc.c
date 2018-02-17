@@ -19,17 +19,15 @@ uint8_t ReadCalibrationByte(uint8_t index);
 
 void ADC_configurate() 
 {
-	PORTA.DIRCLR = PIN0_bm | PIN1_bm;
+	PORTA.DIRCLR = PIN1_bm;
 
 	ADCA.CTRLA=ADC_ENABLE_bm;
-	// Rozdzielczoœæ 12 bitów, tryb ze znakiem
+	// Rozdzielczoœæ 11 bitów, tryb ze znakiem
 	ADCA.CTRLB=ADC_CONMODE_bm;
 	// Referencja 1V
-	ADCA.REFCTRL=ADC_REFSEL_INT1V_gc | ADC_BANDGAP_bm;
+	ADCA.REFCTRL=ADC_REFSEL_AREFA_gc;
 	// CLKADC=1 MHz
 	ADCA.PRESCALER=ADC_PRESCALER_DIV32_gc;  
-	//Wyzwalanie kana³u 0 przez EVCH0
-	ADCA.EVCTRL=ADC_EVSEL_0123_gc | ADC_SWEEP_0_gc | ADC_EVACT_SWEEP_gc;   
 	// Kalibracja kana³ów ADC
 	ADCA.CALL=ReadCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
 	ADCA.CALH=ReadCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1));
