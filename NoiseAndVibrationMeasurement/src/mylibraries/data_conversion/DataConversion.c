@@ -29,17 +29,18 @@ float convert_binary_to_acceleration_2g_mode(int16_t *rawData)
 	return (float)*rawData / 1024;
 }
 
-float convert_rmsVoltage_to_dbSPL(	float *rmsVoltage_array, uint16_t arraySize,
+float convert_rmsVoltage_to_dbSPL(	uint32_t *rmsVoltage_array, uint16_t arraySize,
 									double opAmpGain, double sensitivity_inVolts)
 {
 	double result = calculate_arithmeticMean(rmsVoltage_array, arraySize);
-	double pascalPresure = result / opAmpGain / sensitivity_inVolts;
+	double pascalPresure = (result / 1000) / opAmpGain / sensitivity_inVolts;
+	//sendString_with_float(&USARTC0, pascalPresure,"\rpascalPresure =  ", "");
 
 	return (float)20*log10(pascalPresure/0.00002);
 }
 
 
-double calculate_arithmeticMean(float *numbersArray, uint16_t arraySize)
+double calculate_arithmeticMean(uint32_t *numbersArray, uint16_t arraySize)
 {
 	double accumulator = 0;
 	
@@ -68,13 +69,13 @@ uint8_t calculate_trueRMS_float(	float *newData,
  }
 
 uint8_t calculate_trueRMS_binary(	int16_t *newData,
-									int32_t *actualResult_binary,
-									uint16_t sampleCount,
+									uint32_t *actualResult_binary,
+									uint16_t *sampleCount,
 									uint16_t sampleCountRequired)
 {
-	if(sampleCount < sampleCountRequired)
+	if(*sampleCount < sampleCountRequired)
 	{
-		*actualResult_binary += ((int32_t)(*newData) * (int32_t)(*newData));
+		*actualResult_binary += (int32_t)(*newData) * (int32_t)(*newData);
 		return 0;
 	}
 	else
