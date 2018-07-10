@@ -19,6 +19,10 @@
 
 #define VIBRATION_SAMPLE_REQUIRED 1000
 #define SOUND_LEVEL_SAMPLE_REQUIRED		1000
+#define SOUND_LEVEL_RMS_SAMPLE_REQUIRED	1
+
+#define OP_AMP_GAIN 8.0
+#define MICROPHONE_SENSITIVITY_IN_VOLTS 0.0063096
 
 typedef enum
 {
@@ -69,9 +73,13 @@ int main(void)
 	uint16_t microphoneVoltageSampleCount = 0;
 	int16_t voltageSamples_binary[SOUND_LEVEL_SAMPLE_REQUIRED];
 	
+	uint16_t trueRMS_microphoneVoltage_sampleCount = 0;
+	uint32_t trueRMS_microphoneVoltageSamples[SOUND_LEVEL_RMS_SAMPLE_REQUIRED];
+	
 	enableOscillator_32mhz();
-	//configurateInterrupts();
+	configurateInterrupts();
 	USART_configurate();
+	ADC_configurate();
 
 	USART_send(&USARTC0, "PROGRAM START\n");
 	
@@ -81,7 +89,7 @@ int main(void)
 	else
 		USART_send(&USARTC0, "CONFIG NOK\n");
 
-	//sei();
+	sei();
 	while (1)
 	{
 		
@@ -101,7 +109,7 @@ int main(void)
 
 			case VIBRATIONS_MEASURE_INIT:
 			{
-				USART_send(&USARTC0, "VIBRATIONS_MEASURE_INIT\n");
+				//USART_send(&USARTC0, "VIBRATIONS_MEASURE_INIT\n");
 				
 				vibrationSampleCount = 0;
 				trueRmsVibrationData.x = 0;
@@ -138,73 +146,80 @@ int main(void)
 			}
 			case VIBRATIONS_DATA_COLLECTED:
 			{	
-				USART_send(&USARTC0, " VIBRATIONS_DATA_COLLECTED\n");
+				//USART_send(&USARTC0, " VIBRATIONS_DATA_COLLECTED\n");
 				//uint8_t MMA845x_recivedValues[6];
 
 				//MMA845x_readDataWithoutCheck(MMA845x_recivedValues);
 
 				//convertAndCalculateVibrationData(MMA845x_recivedValues, &trueRmsVibrationData ,&vibrationSampleCount);
-				global_procesState = MEASURE_DATA_SEND;
+				global_procesState = NOISE_MEASURE_INIT;
 
 					
 				break;		
 			}
 			case NOISE_MEASURE_INIT:
 			{
-				USART_send(&USARTC0, "NOISE_MEASURE_INIT\n");
+				//USART_send(&USARTC0, "NOISE_MEASURE_INIT\n");
 				//USART_send(&USARTF0, "Proces state: NOISE_MEASURE_INIT\n");
 				//setRGB_color(YELLOW, myConfig);
-				//microphoneVoltageSampleCount = 0;
+				microphoneVoltageSampleCount = 0;
 
-				//trueRMS_microphoneVoltage_sampleCount = 0;
-				//trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount] = 0;
+				trueRMS_microphoneVoltage_sampleCount = 0;
+				trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount] = 0;
 
-				//global_actualMeasurement = MICROPHONE_VOLTAGE_MEASUREMENT;
-				//adcCH_noiseMeasure_enable();
-				//adcTriggerTimer_enable();
-				//
-				//global_procesState = WAIT_FOR_ACTION;
+				global_actualMeasurement = MICROPHONE_VOLTAGE_MEASUREMENT;
+				adcCH_noiseMeasure_enable();
+				adcTriggerTimer_enable();
+				
+				global_procesState = WAIT_FOR_ACTION;
 				break;
 			}
 			case NOISE_DATA_READY:
 			{
-				USART_send(&USARTC0, "NOISE_DATA_READY\n");
-				//voltageSamples_binary[microphoneVoltageSampleCount] = ADCA.CH0RES - (-5);
-				//microphoneVoltageSampleCount++;
+				//USART_send(&USARTC0, "NOISE_DATA_READY\n");
+				voltageSamples_binary[microphoneVoltageSampleCount] = ADCA.CH0RES - 1024;
+				microphoneVoltageSampleCount++;
 
-				//if(microphoneVoltageSampleCount == SOUND_LEVEL_SAMPLE_REQUIRED)
-				//{	
-					//adcTriggerTimer_disable();
-					//global_procesState = SOUND_LEVEL_RMS_SAMPLE_CALC;
-				//}
-				//else
-				//{
-					//global_procesState = WAIT_FOR_ACTION;
-				//}
+				if(microphoneVoltageSampleCount >= SOUND_LEVEL_SAMPLE_REQUIRED)
+				{	
+					adcTriggerTimer_disable();
+					global_procesState = SOUND_LEVEL_RMS_SAMPLE_CALC;
+				}
+				else
+				{
+					global_procesState = WAIT_FOR_ACTION;
+				}
 
 				break;
 			}
 			case SOUND_LEVEL_RMS_SAMPLE_CALC:
 			{	
-				USART_send(&USARTC0, "SOUND_LEVEL_RMS_SAMPLE_CALC\n");
+				//USART_send(&USARTC0, "SOUND_LEVEL_RMS_SAMPLE_CALC\n");
 				//float realVoltageSample = 0;
-					//
-				//for (uint16_t sampleCount = 0; sampleCount <= SOUND_LEVEL_SAMPLE_REQUIRED; sampleCount++)
-				//{
+				int16_t realVoltageSample = 0;
+					
+				for (uint16_t sampleCount = 0; sampleCount <= SOUND_LEVEL_SAMPLE_REQUIRED; sampleCount++)
+				{
 					//realVoltageSample = (voltageSamples_binary[sampleCount] / 2047.0f);
+					realVoltageSample = (int16_t)voltageSamples_binary[sampleCount];
 //
 					//if(calculate_trueRMS_float(	&realVoltageSample, 
 												//&trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount],
 												//&sampleCount,
 												//SOUND_LEVEL_SAMPLE_REQUIRED ))
-					//{	
-						////sendString_with_float(	&USARTF0,
-												////trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount],
-												////"TrueRMS value: ",
-												////"[V]\n"
-												////);										
-					//}
-				//}
+					if(calculate_trueRMS_binary(	&realVoltageSample,
+													&trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount],
+													&sampleCount,
+													SOUND_LEVEL_SAMPLE_REQUIRED))
+					{	
+						sendString_with_float(	&USARTC0,
+												trueRMS_microphoneVoltageSamples[trueRMS_microphoneVoltage_sampleCount],
+												"TrueRMS value: ",
+												"[mV]\n"
+												);		
+						global_procesState = MEASURE_DATA_SEND;								
+					}
+				}
 
 				/*
 				char resultValue_string[9];
@@ -240,25 +255,25 @@ int main(void)
 			{			
 				USART_send(&USARTC0, "MEASURE_DATA_SEND\n");	
 				USART_send(&USARTC0, "\nVibration result: \n"); 
-				sendString_with_float(&USARTC0, trueRmsVibrationData.x, "Xrms = ", "[g]\n");
-				sendString_with_float(&USARTC0, trueRmsVibrationData.y, "Yrms = ", "[g]\n");
-				sendString_with_float(&USARTC0, trueRmsVibrationData.z, "Zrms = ", "[g]\n");
+				//sendString_with_float(&USARTC0, trueRmsVibrationData.x, "Xrms = ", "[g]\n");
+				//sendString_with_float(&USARTC0, trueRmsVibrationData.y, "Yrms = ", "[g]\n");
+				//sendString_with_float(&USARTC0, trueRmsVibrationData.z, "Zrms = ", "[g]\n");
 							
-				//float soundLevelMeasureResult = convert_rmsVoltage_to_dbSPL(
-				//										trueRMS_microphoneVoltageSamples,
-				//										SOUND_LEVEL_RMS_SAMPLE_REQUIRED,
-				//										OP_AMP_GAIN, MICROPHONE_SENSITIVITY_IN_VOLTS );
+				float soundLevelMeasureResult = convert_rmsVoltage_to_dbSPL(
+														trueRMS_microphoneVoltageSamples,
+														SOUND_LEVEL_RMS_SAMPLE_REQUIRED,
+														OP_AMP_GAIN, MICROPHONE_SENSITIVITY_IN_VOLTS );
 
-				//if (soundLevelMeasureResult > 65.0)
-				//{
-					//sendString_with_float(&USARTF0, soundLevelMeasureResult,"\rSPL sound level =  ", "[dB]");
-				//}
-				//else
-				//{
-					//sendString_with_float(&USARTF0, 65,						"\rSPL sound level = >", "[dB]");
-				//}
-//
-				//USART_send(&USARTF0, "\n\n");
+				if (soundLevelMeasureResult > 65.0)
+				{
+					sendString_with_float(&USARTC0, soundLevelMeasureResult,"\rSPL sound level =  ", "[dB]");
+				}
+				else
+				{
+					sendString_with_float(&USARTC0, 65,						"\rSPL sound level = >", "[dB]");
+				}
+
+				USART_send(&USARTC0, "\n\n");
 
 				//sendMeasureDataToReciver(	trueRmsVibrationData.x,
 											//trueRmsVibrationData.y,
@@ -308,6 +323,11 @@ int main(void)
 ISR(PORTD_INT_vect)
 {
 
+}
+
+ISR(TCC4_OVF_vect)
+{
+	//USART_send(&USARTC0, "1");
 }
 
 ISR(ADCA_CH0_vect)
