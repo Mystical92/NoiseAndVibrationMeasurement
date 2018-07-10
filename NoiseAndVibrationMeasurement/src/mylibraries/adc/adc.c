@@ -24,14 +24,19 @@ void ADC_configurate()
 	ADCA.CTRLA=ADC_ENABLE_bm;
 	// Rozdzielczoœæ 11 bitów, tryb ze znakiem
 	ADCA.CTRLB=ADC_CONMODE_bm;
-	// Referencja 1V
+	// Referencja 2,048V
 	ADCA.REFCTRL=ADC_REFSEL_AREFA_gc;
 	// CLKADC=1 MHz
 	ADCA.PRESCALER=ADC_PRESCALER_DIV32_gc;  
 	// Kalibracja kana³ów ADC
 	ADCA.CALL=ReadCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
 	ADCA.CALH=ReadCalibrationByte(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1));
-
+	
+	ADCA.EVCTRL= ADC_EVSEL_0_gc | ADC_EVACT_CH0_gc;
+	  
+	ADCA.CH0.CTRL= ADC_CH_INPUTMODE_SINGLEENDED_gc;
+	ADCA.CH0.MUXCTRL=ADC_CH_MUXPOS_PIN1_gc;
+	ADCA.CH0.INTCTRL=ADC_CH_INTMODE_COMPLETE_gc | ADC_CH_INTLVL_HI_gc;
 }
 
 void adcCH_noiseMeasure_enable()
@@ -54,6 +59,9 @@ void adcTriggerTimer_init()
 	// PER = 9 dla 50kHz
 	TCC4.PER=499;
 	TCC4.CCA=0;
+	//TCC4.INTCTRLA|=TC4_OVFINTLVL_gm;
+	
+	EVSYS_CH0MUX=EVSYS_CHMUX_TCC4_CCA_gc;
 }
 
 void adcTriggerTimer_enable() 
